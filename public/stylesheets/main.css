@@ -6,6 +6,7 @@ html, body {
 
 body {
   margin: 0;
+  background-color: #EEEEEE;
   background-image:url(${skin.get("bodyBGPhoto")});
   font-size: 15px;
 }
@@ -36,6 +37,8 @@ a:active {
 
 /** header **/
 #header {
+  background-image: url('/public/images/headerBG.png'); /*Little spiffier header bar */
+  background-repeat: repeat-x;
   background-color: #${skin.get("headerBGColor")};
   padding-top: 5px;
   width: 100%;
@@ -49,7 +52,6 @@ a:active {
 
 
 #logo {
-  font: ${skin.get("logoFontSize")}pt;
   color: ${skin.get("logoColor")};
   padding: 0px 10px 0px 20px;
 }
@@ -81,8 +83,14 @@ a:active {
 }
 
 /** left side nav **/
-.left-side-nav {
+.left-side-nav {	
   line-height: 25px;
+  /*Code to make the post stick out against changed background */
+  background-color: white;
+  outline: #CCCCCC groove 1px;
+  margin: 5px 5px 5px; /*top (right & left) left*/
+  
+  
 }
 
 .left-side-nav a {
@@ -106,8 +114,7 @@ a:active {
 }
 
 .profile-pic img{
-  width: 50px;
-  height: 50px;
+  max-width: 140px;
   vertical-align: middle;
 }
 
@@ -149,7 +156,7 @@ a:active {
 }
 
 label {
-  font: ${skin.get("labelFontSize")}pt;
+  font-size: ${skin.get("labelFontSize")}pt;
   color: ${skin.get("labelColor")};
 }
 
@@ -171,7 +178,7 @@ label {
   box-shadow: 1px 1px 2px #${skin.get("buttonBoxShadowColor")};
   background-color: ${skin.get("buttonBGColor")};
   text-decoration: ${skin.get("buttonTextDec")};
-  padding: 0px 2px 0px 2px; // left and right padding
+  padding: 0px 2px 0px 2px;
 }
 
 a.button:link {color:${skin.get("buttonLinkUnvisitedColor")};}      /* unvisited link */
@@ -187,6 +194,11 @@ a.logo:active {text-decoration:none;}
 .post {
   width: 100%;
   border-bottom: 1px solid #dddddd;
+   /*Code to make the post stick out against changed background */
+  background-color: white;
+  outline: #CCCCCC groove 1px;
+  margin: 10px 5px 10px; /*top (right & left) left*/
+  
 }
 
 .post .left {
