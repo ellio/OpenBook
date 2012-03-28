@@ -14,7 +14,7 @@
     </div>
     <br />
     #{if user.checkFriendship(user.id) == 'Request Friendship'}
-      <a id="friend-button" href="@{Application.requestFriends(user.id)}">
+      <a id="friend-button" href="@{Relationships.requestFriends(user.id)}">
         ${user.checkFriendship(user.id)}
       </a>
     #{/if}
@@ -23,7 +23,7 @@
     #{/elseif}
     #{elseif user.checkFriendship(user.id) == 'Friends'}
       Friends :) 
-      <a id="friend-button" href="@{Application.removeFriends(user.id)}">
+      <a id="friend-button" href="@{Relationships.removeFriends(user.id)}">
         Remove friend
       </a>
     #{/elseif}

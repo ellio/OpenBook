@@ -47,8 +47,8 @@
         				<img style="width:50px; height:50px;" src=@{Photos.getPhoto(request.from.profile.profilePhoto)} />
 					    <a style="color: #000099;" href=@{Application.news(request.from.id)}> ${request.from}</a>
 					    <br>
-					    <a style="color: #000099;" href=@{Application.requestFriends(request.from.id)}>Accept</a> 
-					    <a style="color: #000099;" href=@{Application.removeFriends(request.from.id)}>Deny</a>
+					    <a style="color: #000099;" href=@{Relationships.requestFriends(request.from.id)}>Accept</a> 
+					    <a style="color: #000099;" href=@{Relationships.removeFriends(request.from.id)}>Deny</a>
 					    <br>
 					</div>
 			  #{/list}
