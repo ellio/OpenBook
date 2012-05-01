@@ -14,7 +14,7 @@ import play.modules.elasticsearch.search.SearchResults;
 import play.libs.Crypto;
 
 @Entity
-public class Page extends Model {
+public class Page extends Postable {
 	
 	@OneToOne
 	public User admin;
@@ -23,6 +23,11 @@ public class Page extends Model {
 	public String info;
 	public String title;
 	
+	public Long profilePhoto;
+	
+	@OneToMany
+	public List<Photo> photos;
+	
 	public Page(User user, String newTitle, String newInfo){
 		this.admin = user;
 		this.title = newTitle;
@@ -30,7 +35,7 @@ public class Page extends Model {
 	}
 		
 	public List<Post> getPosts(){
-		return Post.find("SELECT p FROM Post p WHERE p.postType = ? and p.title = ? order by p.updatedAt desc",Post.type.PAGE,this.id.toString()).fetch();	
+		return posts;
 	}
 
 }

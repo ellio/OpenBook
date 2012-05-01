@@ -1,6 +1,10 @@
 package models;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import play.utils.HTML;
+
 import javax.persistence.*;
 
 import controllers.Security;
@@ -10,43 +14,39 @@ import play.modules.elasticsearch.annotations.ElasticSearchable;
 
 
 @Entity
-public class Post extends Status {
-  
-  public enum type{NEWS,PAGE,GROUP,EVENT};
-  public type postType;
+public class Post extends Commentable {
 
-  public String title;
+  private static final Pattern links_pattern = Pattern.compile("\\b?[@#]\\w*\\b");
+
+  @ManyToOne
+  public Postable postedObj; // The postable object this post was posted on.
+
+  @ManyToMany(cascade=CascadeType.PERSIST)
+  public Set<Tag> tags;
+
+  @ManyToMany(cascade=CascadeType.PERSIST)
+  public List<User> mentions;
 
   @Lob
-  public String text;
+  public String content;
 
   private static final int TEASER_LENGTH = 150;
 
-  public Post(User author, String title, String content) {
-    super(author, content);
-    this.title = title;
-    this.text = content;
-    this.postType = type.NEWS;
+  public Post(Postable postedObj, User author, String content) {
+    super(author);
+    this.postedObj = postedObj;
+    this.tags = new TreeSet<Tag>();
+    this.mentions = new ArrayList<User>();
+    this.content = parseContent(HTML.htmlEscape(content));
   }
-  
-  public Post(User author, String title, String content, type t) {
-    super(author, content);
-    this.title = title;
-    this.text = content;
-    this.postType = t;
-  }
-  
+
   public String contentTeaser() {
-	  if (this.content.length() < TEASER_LENGTH) {
-		  return this.content;
-	  } else {
-		  return this.content.substring(0, TEASER_LENGTH);
-	  }
+    return this.content.length() < TEASER_LENGTH ? this.content : this.content.substring(0, TEASER_LENGTH);
   }
 
   public Post previous() {
-    return Post.find("author = ? AND date < ? order by date desc",
-                     this.author, this.createdAt).first();
+    return Post.find("owner = ? AND date < ? order by date desc",
+                     this.owner, this.createdAt).first();
   }
 
   public Post next() {
@@ -54,7 +54,34 @@ public class Post extends Status {
       .first();
   }
 
-  public boolean byCurrentUser() {
-    return author.email.equals( Security.connected() );
+  public String parseContent(String unlinked_content){
+    Matcher links_matcher = links_pattern.matcher(unlinked_content);
+
+    while(links_matcher.find() ){
+      String match = links_matcher.group();
+      if(match.startsWith("#")) { // tag
+        String tag = match.substring(1);
+        Tag newTag = Tag.findOrCreateByName(tag);
+        tags.add(newTag);
+        unlinked_content = unlinked_content.replace(match, ("<a href=\"#\"}>" + match + "</a>"));
+      }
+      else if(match.startsWith("@")) { // mention
+        User newMention = User.find("byUsername", match.substring(1)).first();
+        if(newMention != null){
+          unlinked_content = unlinked_content.replace(match, ("<a href=\"#\">" + newMention.name + "</a>"));
+          mentions.add(newMention);
+        }
+      }
+      else
+        System.out.print("Error occured"); // not good
+    }
+    return unlinked_content;
+  }
+
+
+  // What is this used for?
+  public static List<Status> findTaggedWith(String... tags) {
+    return Status.find("select distiinct p from Status p join p.tags as t where t.name in (:tags) group by p.id, p.owner, p.message, p.update_time having count(t.id) = :size"
+                       ).bind("tags", tags).bind("size", tags.length).fetch();
   }
 }

@@ -11,30 +11,31 @@ import java.util.*;
 
 import javax.persistence.*;
 
-@With(Secure.class)
-public class FThreads extends OBController {
+public class FThreads extends OBController
+{
 
-	@Before
-	static void setConnectedUser() 
-	{
-		if (Security.isConnected()) 
-		{
-			renderArgs.put("currentUser", user());
-		}
-	}
-	
-	public static User user() {
-		assert Secure.Security.connected() != null;
-		return User.find("byEmail", Secure.Security.connected()).first();
-	}
+	@OneToMany(mappedBy = "fthread", cascade = CascadeType.ALL)
+	public List<Comment> allComments;
 
 	public static void listSingle(Long threadId)
 	{
 		FThread thread = FThread.findById(threadId);
-        render(thread);
+		User _user = Application.user();
+		render(thread, _user);
 	}
-	
-	@OneToMany(mappedBy = "fthread", cascade = CascadeType.ALL)
-	public List<Comment> allComments;
 
+	public static void newThread(Long categoryId, String title, String content)
+	{
+		Category c = Category.findById(categoryId);
+		FThread newThread = new FThread(c, title, Application.user(),
+		        new Date(), content);
+		newThread.save();
+		renderJSON(newThread.id);
+	}
+
+	public static void deleteThread(Long threadId)
+	{
+		FThread t = FThread.findById(threadId);
+		t.delete();
+	}
 }
